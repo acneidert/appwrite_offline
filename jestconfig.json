@@ -2,6 +2,8 @@
     "transform": {
       "^.+\\.(t|j)sx?$": "ts-jest"
     },
+    "setupFiles": ["jest-localstorage-mock"],
     "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.(jsx?|tsx?)$",
-    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"]
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx", "json", "node"],
+    "testPathIgnorePatterns": ["/__fixtures__/", "/__utils__/"]
   }

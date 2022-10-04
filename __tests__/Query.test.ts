@@ -40,22 +40,22 @@ describe('Not Equal Query', () => {
   });
 });
 
-describe('Less Than Query', () => {
-  test('Normal', () => {
-    expect(Query.lessThan('attribute', 'value')()).toBe('lessThan("attribute", ["value"])');
-  });
+// describe('Less Than Query', () => {
+//   test('Normal', () => {
+//     expect(Query.lessThan('attribute', 'value')()).toBe('lessThan("attribute", ["value"])');
+//   });
 
-  test('Normal + Array', () => {
-    expect(Query.lessThan('attribute', ["value","value2"])()).toBe('lessThan("attribute", ["value","value2"])');
-  });
+//   test('Normal + Array', () => {
+//     expect(Query.lessThan('attribute', ["value","value2"])()).toBe('lessThan("attribute", ["value","value2"])');
+//   });
 
-  test('Minimongo', () => {
-    expect(Query.lessThan('attribute', 'value')(true)).toMatchObject({ attribute: { $lt : 'value' } });
-  });
+//   test('Minimongo', () => {
+//     expect(Query.lessThan('attribute', 'value')(true)).toMatchObject({ attribute: { $lt : 'value' } });
+//   });
 
-  test('Minimongo + Array', () => {
-    expect(Query.lessThan('attribute', ["value","value2"])(true)).toMatchObject({
-      attribute: { $nin: ["value","value2"] },
-    });
-  });
-});
+//   test('Minimongo + Array', () => {
+//     expect(Query.lessThan('attribute', ["value","value2"])(true)).toMatchObject({
+//       attribute: { $nin: ["value","value2"] },
+//     });
+//   });
+// });

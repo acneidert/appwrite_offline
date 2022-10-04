@@ -1,0 +1,28 @@
+import { 
+    indexedDB,
+    IDBCursor,
+    IDBCursorWithValue,
+    IDBDatabase,
+    IDBFactory,
+    IDBIndex,
+    IDBKeyRange,
+    IDBObjectStore,
+    IDBOpenDBRequest,
+    IDBRequest,
+    IDBTransaction,
+    IDBVersionChangeEvent ,
+} from 'fake-indexeddb';
+export const configIndexedDb = {
+    indexedDB:indexedDB,
+    IDBCursor:IDBCursor,
+    IDBCursorWithValue:IDBCursorWithValue,
+    IDBDatabase:IDBDatabase,
+    IDBFactory:IDBFactory,
+    IDBIndex:IDBIndex,
+    IDBKeyRange:IDBKeyRange,
+    IDBObjectStore:IDBObjectStore,
+    IDBOpenDBRequest:IDBOpenDBRequest,
+    IDBRequest:IDBRequest,
+    IDBTransaction:IDBTransaction,
+    IDBVersionChangeEvent:IDBVersionChangeEvent,
+}
