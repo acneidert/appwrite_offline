@@ -21,6 +21,10 @@
   },
   "author": "Andre Neidert <acneidert@gmail.com>",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/acneidert/appwrite_offline.git"
+  },
   "dependencies": {
     "appwrite": "^10.1.0",
     "minimongo": "^6.12.6",
