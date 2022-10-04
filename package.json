@@ -21,6 +21,10 @@
   },
   "author": "Andre Neidert <acneidert@gmail.com>",
   "license": "ISC",
+  "homepage": "https://github.com/acneidert/appwrite_offline",
+  "bugs": {
+    "url": "https://github.com/acneidert/appwrite_offline/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/acneidert/appwrite_offline.git"
