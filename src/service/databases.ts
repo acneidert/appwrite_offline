@@ -2,10 +2,8 @@ import { Databases as DatabasesAppWrite, ID } from 'appwrite';
 import { AppwriteException, Client } from 'appwrite';
 import type { Models } from 'appwrite/types';
 import type { Payload } from 'appwrite/types';
-import type { LocalStorageDb } from 'minimongo';
 import { v4 as uuidv4 } from 'uuid';
 import minimongo from 'minimongo';
-import { parseQuery } from '../util/QueryUtil';
 const CONTENT_TYPE = { 'content-type': 'application/json' };
 
 export class Databases extends DatabasesAppWrite {
@@ -84,19 +82,21 @@ export class Databases extends DatabasesAppWrite {
       .replace('{databaseId}', databaseId)
       .replace('{collectionId}', collectionId);
     let payload: Payload = {};
-
-    if (typeof queries !== 'undefined') {
-      payload['queries'] = queries.map((qry) => qry());
-    }
+    
     let localQuery = {
       ___deleted: false,
     };
-    for (const query of queries) {
-      localQuery = {
-        ...localQuery,
-        ...query(true),
-      };
+
+    if (typeof queries !== 'undefined') {
+      payload['queries'] = queries.map((qry) => qry());
+      for (const query of queries) {
+        localQuery = {
+          ...localQuery,
+          ...query(true),
+        };
+      }
     }
+
     try {
       const uri = new URL(this.client.config.endpoint + path);
       const call = await this.client.call('get', uri, CONTENT_TYPE, payload);
