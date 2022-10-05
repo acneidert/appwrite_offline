@@ -7,6 +7,7 @@ import { DocumentBase } from './__utils__/DocumentBase';
 beforeAll(() => {
   InitializeBrowser();
 });
+
 describe('Online Actions', () => {
   test('Create a Document', async () => {
     const { databases } = getAppwriteConn();
@@ -27,17 +28,21 @@ describe('Online Actions', () => {
         changeAt_,
       }),
     );
+
   });
 
-  // test('List All Documents', async () => {
-  //   ex
-  // })
+  test('List All Documents without Query', async () => {
+    const { databases } = getAppwriteConn();
+    const promise = databases.listDocuments('teste', 'col_teste');
+    const ret = ( await ResProm(promise) as {total: number, documents: Array<any>});
+    expect(ret.documents).toHaveLength(1);
+  })
 })
 
 
 describe('Offline Actions', () => {
   test('Create a Document', async () => {
-    const { client, databases } = getAppwriteConn();
+    const { client, databases }: {databases: any, client: any}  = getAppwriteConn();
     client.offline = true;
     const changeAt_ = new Date().toISOString();
     const promise = databases.createDocument('teste', 'col_teste', '0', {
@@ -50,7 +55,7 @@ describe('Offline Actions', () => {
   });
 
   test('List All Documents', async () => {
-    const { databases } = getAppwriteConn();
+    const { databases }: {databases: any} = getAppwriteConn();
     const [collection] = await databases._getCollection('col_teste', 'teste');
     const allDocs = await collection.find({}).fetch();
     expect(allDocs.length).toBeGreaterThan(0);
