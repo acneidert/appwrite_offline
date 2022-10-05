@@ -14,7 +14,7 @@ describe('Online Actions', () => {
   
     const changeAt_ = new Date().toISOString();
   
-    const promise = databases.createDocument('teste', 'col_teste', ID.unique(), {
+    const promise = databases.createDocument('teste', 'col_teste', 'online_00', {
       nome: 'Teste',
       obs: 'Teste Obs',
       changeAt_,
@@ -22,7 +22,7 @@ describe('Online Actions', () => {
   
     // return all documents online
     expect(await ResProm(promise)).toMatchObject(
-      DocumentBase('teste', 'col_teste', {
+      DocumentBase('teste', 'col_teste', 'online_00', {
         nome: 'Teste',
         obs: 'Teste Obs',
         changeAt_,
@@ -35,8 +35,19 @@ describe('Online Actions', () => {
     const { databases } = getAppwriteConn();
     const promise = databases.listDocuments('teste', 'col_teste');
     const ret = ( await ResProm(promise) as {total: number, documents: Array<any>});
+    console.log(ret)
     expect(ret.documents).toHaveLength(1);
+  });
+
+  test('Update Document',async () => {
+    const {databases} = getAppwriteConn();
+    const prom = databases.updateDocument('teste', 'col_teste', 'online_00', {
+      nome: 'Changed',
+    });
+    const ret = await ResProm(prom);
+    console.log(ret)
   })
+
 })
 
 
@@ -45,7 +56,7 @@ describe('Offline Actions', () => {
     const { client, databases }: {databases: any, client: any}  = getAppwriteConn();
     client.offline = true;
     const changeAt_ = new Date().toISOString();
-    const promise = databases.createDocument('teste', 'col_teste', '0', {
+    const promise = databases.createDocument('teste', 'col_teste', 'offline_00', {
       nome: 'Teste',
       obs: 'Teste Obs',
       changeAt_,

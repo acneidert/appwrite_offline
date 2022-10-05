@@ -1,6 +1,6 @@
-export const DocumentBase = (database: string, collection: string, data: {}) => ({
+export const DocumentBase = (database: string, collection: string, id: string, data: {}) => ({
     ...data,
-    $id: '00000000000000000000',
+    $id: id,
     $permissions: [
       'read("user:00000000000000000000")',
       'update("user:00000000000000000000")',
