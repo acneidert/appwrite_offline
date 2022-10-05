@@ -1,11 +1,14 @@
-import { Client as AppClient, Payload } from 'appwrite';
+import { Client as AppClient, Payload, AppwriteException } from 'appwrite';
 
 type Headers = {
   [key: string]: string;
 };
 
 class Client extends AppClient {
+  offline = false;
   async call(method: string, url: URL, headers: Headers = {}, params: Payload = {}): Promise<any> {
+    if(this.offline)  throw new AppwriteException('Is Offline');
+    
     const arrayUrl = url.href.split('/')
     const collection = arrayUrl[arrayUrl.length - 2]
     const database = arrayUrl[arrayUrl.length - 4]
