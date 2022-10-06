@@ -1,9 +1,21 @@
 import { Databases as DatabasesAppWrite, ID } from 'appwrite';
 import { AppwriteException, Client } from 'appwrite';
-import type { Models } from 'appwrite/types';
-import type { Payload } from 'appwrite/types';
 import { v4 as uuidv4 } from 'uuid';
 import minimongo from 'minimongo';
+import { parseQuery } from '../util/QueryUtil';
+import type { Payload } from 'appwrite/types';
+import type { Models } from 'appwrite/types';
+import type { Databases as IDatabasesAppWrite } from 'appwrite/types';
+
+export type typeDatabase = IDatabasesAppWrite & {
+  _getCollection(collectionId: string, databaseId: string): Promise<any[]>;
+  listDocuments<Document extends Models.Document>(
+    databaseId: string,
+    collectionId: string,
+    queries?: any[],
+  ): Promise<Models.DocumentList<Document>>;
+};
+
 const CONTENT_TYPE = { 'content-type': 'application/json' };
 
 export class Databases extends DatabasesAppWrite {
@@ -18,7 +30,7 @@ export class Databases extends DatabasesAppWrite {
     const nonSynced = await collection.find({ ___synced: false }).fetch();
   }
 
-  async _getCollection(collectionId, databaseId) {
+  async _getCollection(collectionId: string, databaseId: string) {
     if (this.db === null) {
       const IndexedDb = minimongo.IndexedDb;
       this.db = await new Promise((resolve, reject) => {
@@ -82,17 +94,18 @@ export class Databases extends DatabasesAppWrite {
       .replace('{databaseId}', databaseId)
       .replace('{collectionId}', collectionId);
     let payload: Payload = {};
-    
+
     let localQuery = {
-      ___deleted: false,
+      '___meta.___deleted': false,
     };
 
     if (typeof queries !== 'undefined') {
-      payload['queries'] = queries.map((qry) => qry());
+      payload['queries'] = queries.map((qry) => (typeof qry === 'string' ? qry : qry()));
       for (const query of queries) {
+        const qry = typeof query === 'string' ? parseQuery(query) : query(true);
         localQuery = {
           ...localQuery,
-          ...query(true),
+          ...qry,
         };
       }
     }
@@ -101,9 +114,12 @@ export class Databases extends DatabasesAppWrite {
       const uri = new URL(this.client.config.endpoint + path);
       const call = await this.client.call('get', uri, CONTENT_TYPE, payload);
       for (const document of call.documents) {
-        const doc = await collection.findOne({ documentId: document.$id }, {});
-        doc.___synced = true;
-        doc.data = document;
+        let doc = await collection.findOne({ '___meta.documentId': document.$id }, {});
+        doc.___meta.___synced = true;
+        doc = {
+          ...doc,
+          ...document,
+        };
         await collection.upsert(doc);
       }
       return call;
@@ -111,7 +127,7 @@ export class Databases extends DatabasesAppWrite {
       const allDocs = await collection.find(localQuery).fetch();
       const documents = [];
       for (const doc of allDocs) {
-        documents.push(doc.data);
+        documents.push(doc);
       }
       return { total: allDocs.length, documents };
     }
@@ -163,19 +179,19 @@ export class Databases extends DatabasesAppWrite {
     const [collection] = await this._getCollection(collectionId, databaseId);
 
     const inserted = await collection.upsert({
-      documentId,
-      data: {
-        $collectionId: collectionId,
-        $createdAt: new Date().toISOString(),
-        $databaseId: databaseId,
-        $id: documentId,
-        $permissions: [],
-        $updatedAt: new Date().toISOString(),
-        ...data,
+      ...data,
+      $collectionId: collectionId,
+      $createdAt: new Date().toISOString(),
+      $databaseId: databaseId,
+      $id: documentId,
+      $permissions: [],
+      $updatedAt: new Date().toISOString(),
+      ___meta: {
+        documentId,
+        ___deleted: false,
+        ___created: new Date().toISOString(),
+        ___synced: false,
       },
-      ___deleted: false,
-      ___created: new Date().toISOString(),
-      ___synced: false,
     });
 
     let path = '/databases/{databaseId}/collections/{collectionId}/documents'
@@ -198,9 +214,12 @@ export class Databases extends DatabasesAppWrite {
     const uri = new URL(this.client.config.endpoint + path);
     try {
       const call = await this.client.call('post', uri, CONTENT_TYPE, payload);
-      const doc = await collection.findOne({ documentId }, {});
-      doc.___synced = true;
-      doc.data = call;
+      let doc = await collection.findOne({ '___meta.documentId': documentId }, {});
+      doc.___meta.___synced = true;
+      doc = {
+        ...doc,
+        ...call,
+      };
       await collection.upsert(doc);
       return call;
     } catch (e) {
@@ -246,13 +265,16 @@ export class Databases extends DatabasesAppWrite {
     try {
       const uri = new URL(this.client.config.endpoint + path);
       const call = await this.client.call('get', uri, CONTENT_TYPE, payload);
-      const doc = await collection.findOne({ documentId }, {});
-      doc.___synced = true;
-      doc.data = call;
+      let doc = await collection.findOne({ '___meta.documentId': documentId }, {});
+      doc.___meta.___synced = true;
+      doc = {
+        ...doc,
+        ...call,
+      };
       await collection.upsert(doc);
       return call;
     } catch (error) {
-      return await collection.findOne({ documentId }, { ___deleted: false });
+      return await collection.findOne({ '___meta.documentId': documentId }, { '___meta.___deleted': false });
     }
   }
 
@@ -306,18 +328,25 @@ export class Databases extends DatabasesAppWrite {
     try {
       const uri = new URL(this.client.config.endpoint + path);
       const call = await this.client.call('patch', uri, CONTENT_TYPE, payload);
-      const doc = await collection.findOne({ documentId }, {});
-      doc.___synced = true;
+      let doc = await collection.findOne({ '___meta.documentId': documentId }, {});
+      doc.___meta.___synced = true;
       doc.___created = new Date().toISOString();
-      doc.data = call;
+      doc = {
+        ...doc,
+        ...call,
+      };
       await collection.upsert(doc);
       return call;
     } catch (error) {
-      const doc = await collection.findOne({ documentId }, {});
-      doc.___synced = false;
+      let doc = await collection.findOne({ '___meta.documentId': documentId }, {});
+      doc.___meta.___synced = false;
       doc.___created = new Date().toISOString();
-      doc.data = data;
+      doc = {
+        ...doc,
+        ...data,
+      };
       await collection.upsert(doc);
+      return doc;
     }
   }
 
@@ -354,12 +383,12 @@ export class Databases extends DatabasesAppWrite {
     try {
       const uri = new URL(this.client.config.endpoint + path);
       const call = await this.client.call('delete', uri, CONTENT_TYPE, payload);
-      const doc = await collection.findOne({ documentId }, {});
+      const doc = await collection.findOne({ '___meta.documentId': documentId }, {});
       await collection.remove(doc._id);
       return call;
     } catch (error) {
-      const doc = await collection.findOne({ documentId }, {});
-      doc.___deleted = true;
+      const doc = await collection.findOne({ '___meta.documentId': documentId }, {});
+      doc.___meta.___deleted = true;
       await collection.upsert(doc);
     }
   }

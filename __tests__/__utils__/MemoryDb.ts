@@ -26,8 +26,8 @@
     }
 
     public add(id: string, data: object) {
-        this.data[id] = data
-        return data
+        this.data[id] = {...data, '$__from': 'database'}
+        return this.data[id] 
     }
 
     public getById(id: string) {
@@ -35,7 +35,10 @@
     }
 
     public listAll() {
-        return Object.values(this.data);
+        return {
+            total: Object.values(this.data).length, 
+            documents: Object.values(this.data),
+        };
     }
 
     public update(id: string, data: object) {

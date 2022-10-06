@@ -1,5 +1,5 @@
 import { Client as AppClient, Payload, AppwriteException } from 'appwrite';
-import { MemoryDb } from './../__tests__/__utils__/MemoryDb';
+import { MemoryDb } from '../__tests__/__utils__/MemoryDb';
 
 type Headers = {
   [key: string]: string;

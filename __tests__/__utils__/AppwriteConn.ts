@@ -1,14 +1,14 @@
 import { Client, Databases } from '../../index';
 
-import type { Databases as tDatabases } from 'appwrite';
 import type { Client as tClient } from 'appwrite';
+import { typeDatabase } from '../../src/service/databases';
 
 const ENDPOINT = 'http://localhost/v1';
 const PROJECT = 'offline';
 
 type objProps = {
   client: null | tClient;
-  databases: null | tDatabases;
+  databases: null | typeDatabase;
 };
 const obj: objProps = {
   client: null,
@@ -18,7 +18,7 @@ const obj: objProps = {
 export const getAppwriteConn = (
   endpoint: string | null = null,
   project: string | null = null,
-): { client: tClient; databases: tDatabases } => {
+): { client: tClient; databases: typeDatabase } => {
   if (!obj.client) obj.client = new Client();
   if (!obj.databases) obj.databases = new Databases(obj.client);
 
