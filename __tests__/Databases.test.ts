@@ -141,5 +141,30 @@ describe('With Offline Actions', () => {
     expect(thisMustBeEmpty.___meta.___deleted).toBeTruthy();
     expect(thisMustBeEmpty.___meta.___synced).toBeFalsy();
   })
-
 });
+
+describe('Synchronization', ()=>{
+  beforeAll(async () => {
+    const { client, databases }: { databases: any; client: any } = getAppwriteConn();
+    const changeAt_ = new Date().toISOString();
+    for(let i = 0 ; i < 10 ; i++ ) {
+      client.offline = (i % 2 === 0);
+      const promise = databases.createDocument('teste', 'col_teste', 'offline_0' + i, {
+        nome: 'Teste ' + i,
+        obs: 'Teste Obs',
+        changeAt_,
+      });
+      await ResProm(promise);
+    }
+  });
+  
+  test('It Retrieves Local data Unsynchronizided', async () => {
+    const { client, databases }: { databases: any; client: any } = getAppwriteConn();
+    client.offline = true;
+    await databases.sync('teste', 'col_teste')
+  })
+
+  test('It Sync Local Data with Remote Data', async () => {
+    
+  })
+})

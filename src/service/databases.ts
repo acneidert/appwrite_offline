@@ -14,6 +14,7 @@ export type typeDatabase = IDatabasesAppWrite & {
     collectionId: string,
     queries?: any[],
   ): Promise<Models.DocumentList<Document>>;
+  sync(databaseId: string, collectionId: string): void;
 };
 
 const CONTENT_TYPE = { 'content-type': 'application/json' };
@@ -25,9 +26,11 @@ export class Databases extends DatabasesAppWrite {
     super(client);
   }
 
-  async sync(databaseId, collectionId) {
+  async sync(databaseId: string, collectionId: string) {
     const [collection] = await this._getCollection(collectionId, databaseId);
-    const nonSynced = await collection.find({ ___synced: false }).fetch();
+    const nonSynced = await collection.find({ '___meta.___synced': false }).fetch();
+    console.log('nonSynced', nonSynced);
+    // console.log('allDocs', allDocs);
   }
 
   async _getCollection(collectionId: string, databaseId: string) {
