@@ -22,6 +22,7 @@ export const QueryUtil = (method, attribute, values) => {
   queryFormatted[attribute] = operators[method](values);
   return queryFormatted;
 };
+
 export const parseQuery = (query: string) => {
   // method("attribute", [value,value])
   const rgxMethod = /(.*?)(?=\()/g;
