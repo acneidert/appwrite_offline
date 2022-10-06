@@ -1,6 +1,6 @@
 {
   "name": "@acneidert/appwrite_offline",
-  "version": "0.0.1",
+  "version": "0.0-beta.1",
   "description": "Appwrite Client with Offline Option",
   "keywords": [
     "Appwrite",

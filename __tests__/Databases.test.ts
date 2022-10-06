@@ -3,6 +3,9 @@ import { getAppwriteConn } from './__utils__/AppwriteConn';
 import { InitializeBrowser } from './__utils__/InitializeBrowser';
 import { Query, Account } from '../index';
 
+// TODO: 
+//    * Pagination Test
+
 beforeAll(async () => {
   InitializeBrowser();
 
