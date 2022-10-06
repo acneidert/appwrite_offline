@@ -28,25 +28,20 @@ export class Databases extends DatabasesAppWrite {
 
   async sync(databaseId: string, collectionId: string) {
     const [collection] = await this._getCollection(collectionId, databaseId);
-    const nonSynced = await collection.find({ '___meta.___synced': false }).fetch();
-    console.log('nonSynced', nonSynced);
+    // const nonSynced = await collection.find({ '___meta.___synced': false }).fetch();
     // console.log('allDocs', allDocs);
   }
 
   async _getCollection(collectionId: string, databaseId: string) {
     if (this.db === null) {
       const IndexedDb = minimongo.IndexedDb;
-      this.db = await new Promise((resolve, reject) => {
+      this.db = await new Promise((resolve, reject) => (
         new IndexedDb(
           { namespace: databaseId },
-          (db) => {
-            resolve(db);
-          },
-          (error) => {
-            reject(error);
-          },
-        );
-      });
+          (db) => resolve(db),
+          (error) => reject(error),
+        )
+      ));
     }
     if (!this.db.getCollectionNames().includes(collectionId)) {
       await new Promise((resolve, reject) => {
@@ -93,10 +88,10 @@ export class Databases extends DatabasesAppWrite {
 
     const [collection] = await this._getCollection(collectionId, databaseId);
 
-    let path = '/databases/{databaseId}/collections/{collectionId}/documents'
+    const path = '/databases/{databaseId}/collections/{collectionId}/documents'
       .replace('{databaseId}', databaseId)
       .replace('{collectionId}', collectionId);
-    let payload: Payload = {};
+    const payload: Payload = {};
 
     let localQuery = {
       '___meta.___deleted': false,
@@ -197,10 +192,10 @@ export class Databases extends DatabasesAppWrite {
       },
     });
 
-    let path = '/databases/{databaseId}/collections/{collectionId}/documents'
+    const path = '/databases/{databaseId}/collections/{collectionId}/documents'
       .replace('{databaseId}', databaseId)
       .replace('{collectionId}', collectionId);
-    let payload: Payload = {};
+    const payload: Payload = {};
 
     if (typeof documentId !== 'undefined') {
       payload['documentId'] = documentId;
@@ -259,11 +254,11 @@ export class Databases extends DatabasesAppWrite {
       throw new AppwriteException('Missing required parameter: "documentId"');
     }
 
-    let path = '/databases/{databaseId}/collections/{collectionId}/documents/{documentId}'
+    const path = '/databases/{databaseId}/collections/{collectionId}/documents/{documentId}'
       .replace('{databaseId}', databaseId)
       .replace('{collectionId}', collectionId)
       .replace('{documentId}', documentId);
-    let payload: Payload = {};
+    const payload: Payload = {};
     const [collection] = await this._getCollection(collectionId, databaseId);
     try {
       const uri = new URL(this.client.config.endpoint + path);
@@ -314,11 +309,11 @@ export class Databases extends DatabasesAppWrite {
       throw new AppwriteException('Missing required parameter: "documentId"');
     }
 
-    let path = '/databases/{databaseId}/collections/{collectionId}/documents/{documentId}'
+    const path = '/databases/{databaseId}/collections/{collectionId}/documents/{documentId}'
       .replace('{databaseId}', databaseId)
       .replace('{collectionId}', collectionId)
       .replace('{documentId}', documentId);
-    let payload: Payload = {};
+    const payload: Payload = {};
 
     if (typeof data !== 'undefined') {
       payload['data'] = data;
@@ -377,11 +372,11 @@ export class Databases extends DatabasesAppWrite {
       throw new AppwriteException('Missing required parameter: "documentId"');
     }
 
-    let path = '/databases/{databaseId}/collections/{collectionId}/documents/{documentId}'
+    const path = '/databases/{databaseId}/collections/{collectionId}/documents/{documentId}'
       .replace('{databaseId}', databaseId)
       .replace('{collectionId}', collectionId)
       .replace('{documentId}', documentId);
-    let payload: Payload = {};
+    const payload: Payload = {};
     const [collection] = await this._getCollection(collectionId, databaseId);
     try {
       const uri = new URL(this.client.config.endpoint + path);
