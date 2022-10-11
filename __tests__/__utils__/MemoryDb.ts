@@ -1,3 +1,9 @@
+const operators = {
+    equal: (attribute, value) => (doc) => {
+      if (value instanceof Array) return value.includes(doc[attribute]);
+      return doc[attribute] === value;
+    },
+  };
 /**
  * The MemoryDb class defines the `getInstance` method that lets clients access
  * the unique MemoryDb instance.
@@ -34,12 +40,38 @@
         return this.data[id]
     }
 
-    public listAll() {
+    public listAll(queries: string[] | null = null) {
+        const filters: Function[] = [];
+        if (queries) {
+          queries.forEach((qry: string) => {
+            filters.push(this._parseQuery(qry));
+          })
+        }
+        function filter(doc) {
+          if (filters.length > 0) {
+              filters.forEach((filt: Function) => {
+                if (!filt(doc)) return false;
+              })
+          }
+          return true;
+        }
         return {
-            total: Object.values(this.data).length, 
-            documents: Object.values(this.data),
+            total: Object.values(this.data).filter(filter).length, 
+            documents: Object.values(this.data).filter(filter),
         };
     }
+
+    private _parseQuery(query: string): Function {
+        const rgxMethod = /(.*?)(?=\()/g;
+        const rgxValues = /(?<=\[)(.*?)(?=\])/g;
+        const rgxAttribute = /(?<=\(")(.*?)(?=\")/g;
+        const method = (query.match(rgxMethod) || [''])[0];
+        const values = (query.match(rgxValues) || [''])[0]
+          .split(',')
+          .map((qry) => qry.replaceAll('"', ''));
+        const attribute = (query.match(rgxAttribute) || [''])[0];
+        return operators[method](attribute, values);
+      }
 
     public update(id: string, data: object) {
         this.data[id] = {

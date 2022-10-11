@@ -28,7 +28,12 @@ export class Databases extends DatabasesAppWrite {
 
   async sync(databaseId: string, collectionId: string) {
     const [collection] = await this._getCollection(collectionId, databaseId);
-    // const nonSynced = await collection.find({ '___meta.___synced': false }).fetch();
+    const documents = await collection.find({ '___meta.___synced': false }).fetch();
+    const nonSynced = {
+      databaseId, 
+      collectionId, 
+      documents
+    }
     // console.log('allDocs', allDocs);
   }
 
